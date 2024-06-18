@@ -5,7 +5,7 @@ import InputField from "../components/InputField";
 
 
 
-export default LoginScreen = () => {
+export default LoginScreen = ({navigation}) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,7 +29,7 @@ export default LoginScreen = () => {
                 </TouchableOpacity>
                 <Text style={{textAlign:'center',paddingVertical:30,color:'white',fontSize:20}}>---------Or-----------</Text>
                 <Image source={require('../assets/SocialMedia.png')} style={{alignSelf:'center'}}/>
-                <Text style={{color:'white',alignSelf:'center',paddingTop:40,fontSize:15}}>Don't have an account?<Text style={{color:'black'}}> SignUp</Text></Text>
+                <Text style={{color:'white',alignSelf:'center',paddingTop:40,fontSize:15}}>Don't have an account?<TouchableOpacity onPress={()=>navigation.navigate('SignUp')}><Text style={{color:'black'}}> SignUp</Text></TouchableOpacity></Text>
             </View>
         </View>
 
