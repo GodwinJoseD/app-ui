@@ -23,7 +23,7 @@ export default LoginScreen = ({navigation}) => {
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Password" />
-                <Text style={styles.text}>Forgot password?</Text>
+                <Text style={styles.text} onPress={()=>navigation.navigate('ForgotPassword')}>Forgot password?</Text>
                 <TouchableOpacity style={styles.loginbutton}>
                     <Text style={styles.logintext}>Login</Text>
                 </TouchableOpacity>
