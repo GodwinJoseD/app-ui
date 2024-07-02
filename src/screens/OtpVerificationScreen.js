@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { color } from 'react-native-elements/dist/helpers';
 
-export default OtpVerificationScreen = () => {
+export default OtpVerificationScreen = ({ navigation }) => {
   const [otp, setOtp] = useState(['', '', '', '']);
 
   const handleChange = (index, value) => {
@@ -12,16 +12,17 @@ export default OtpVerificationScreen = () => {
   };
 
   const handleVerify = () => {
-    alert(`OTP entered: ${otp.join('')}`);
+    //alert(`OTP entered: ${otp.join('')}`);
+    navigation.navigate('CreateNewPassword1');
   };
 
   return (
-      <View style={styles.container}>
-        <View style={styles.topView}>
-          <Image source={require('../assets/EnterOTP.png')} style={{ alignSelf: 'center' }} />
-        </View>
-  <View style={styles.bottomView}><Text style={{color:'white',textAlign:'center',fontSize:30,paddingBottom:20}}>OTP Verification</Text>
-        <Text style={{color:'white',textAlign:'center',fontSize:15,paddingBottom:20}}>A 4 Digit Code has been sent to your registered Mobile No or E-Mail</Text>
+    <View style={styles.container}>
+      <View style={styles.topView}>
+        <Image source={require('../assets/EnterOTP.png')} style={{ alignSelf: 'center' }} />
+      </View>
+      <View style={styles.bottomView}><Text style={{ color: 'white', textAlign: 'center', fontSize: 30, paddingBottom: 20 }}>OTP Verification</Text>
+        <Text style={{ color: 'white', textAlign: 'center', fontSize: 15, paddingBottom: 20 }}>A 4 Digit Code has been sent to your registered Mobile No or E-Mail</Text>
         <View style={styles.otpContainer}>
           {otp.map((value, index) => (
             <TextInput
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems:'center',
+    alignItems: 'center',
     width: '80%',
     marginBottom: 20,
   },
@@ -79,10 +80,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'white',
     textAlign: 'center',
-    color:'white',
+    color: 'white',
     fontSize: 18,
     backgroundColor: '#20D4D4',
-    marginHorizontal:5
+    marginHorizontal: 5
   },
   verifyButton: {
     marginTop: 20,
