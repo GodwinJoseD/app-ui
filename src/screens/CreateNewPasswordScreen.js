@@ -12,8 +12,8 @@ export default CreateNewPassword = () => {
                 <Image source={require('../assets/CreateNewPassword.png')} style={{ alignSelf: 'center' }} />
             </View>
             <View style={styles.bottomView}>
-                <Text>Create New Password</Text>
-                <Text>Atleast 9 characters with Uppercase and lowercase letters</Text>
+                <Text style={{color:'white',textAlign:'center',fontSize:30,paddingBottom:30}}>Create New Password</Text>
+                <Text style={{color:'white',textAlign:'center',fontSize:15,paddingBottom:30}}>Atleast 9 characters with Uppercase and lowercase letters</Text>
                 <InputField
                     value={newPassword}
                     onChangeText={setNewPassword}
@@ -22,7 +22,7 @@ export default CreateNewPassword = () => {
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     placeholder="Confirm Password" />
-                    <TouchableOpacity style={styles.button}><Text>Continue</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.button}><Text style={styles.ContinueText}>Continue</Text></TouchableOpacity>
             </View>
         </View>
     )
@@ -52,5 +52,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         backgroundColor: 'white', // Button color
         borderRadius: 20,
+    },
+    text:{
+        color:'white',
+    },
+    ContinueText:{
+        color:'black',
+        fontSize:20,
+        textAlign:'center'
     },
 })

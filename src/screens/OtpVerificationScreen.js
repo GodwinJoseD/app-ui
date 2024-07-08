@@ -13,7 +13,7 @@ export default OtpVerificationScreen = ({ navigation }) => {
 
   const handleVerify = () => {
     //alert(`OTP entered: ${otp.join('')}`);
-    navigation.navigate('CreateNewPassword1');
+    navigation.navigate('CreateNewPassword');
   };
 
   return (

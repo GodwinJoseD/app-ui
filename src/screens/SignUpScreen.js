@@ -21,7 +21,7 @@ export default SignUpScreen = ({navigation}) => {
                     value={email}
                     onChangeText={setEmail}
                     placeholder="Mobile No or E-mail" />
-                <TouchableOpacity style={styles.loginbutton}>
+                <TouchableOpacity style={styles.loginbutton} onPress={()=>navigation.navigate('VerifyOtp')}>
                     <Text style={styles.logintext}>Sign Up</Text>
                 </TouchableOpacity>
                 <Text style={{ textAlign: 'center', paddingVertical: 30, color: 'white', fontSize: 20 }}>---------Or-----------</Text>

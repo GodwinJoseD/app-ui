@@ -29,7 +29,7 @@ export default Navigation=()=>{
                 <Stack.Screen name="SignUp" component={SignUpScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
                 <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
                 <Stack.Screen name="VerifyOtp" component={OtpVerificationScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
-                <Stack.Screen name="CreateNewPassword1" component={CreateNewPasswordScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
+                <Stack.Screen name="CreateNewPassword" component={CreateNewPasswordScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
