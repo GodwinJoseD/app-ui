@@ -7,6 +7,7 @@ import SignUpScreen from "../screens/SignUpScreen";
 import OtpVerificationScreen from "../screens/OtpVerificationScreen";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import CreateNewPasswordScreen from "../screens/CreateNewPasswordScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 
@@ -30,6 +31,7 @@ export default Navigation=()=>{
                 <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
                 <Stack.Screen name="VerifyOtp" component={OtpVerificationScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
                 <Stack.Screen name="CreateNewPassword" component={CreateNewPasswordScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
+                <Stack.Screen name="ProfilePage" component={ProfileScreen} options={{ headerTitle: '',headerBackImage:()=><CustomBackButton/> }}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

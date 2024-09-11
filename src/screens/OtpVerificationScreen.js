@@ -1,47 +1,96 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { color } from 'react-native-elements/dist/helpers';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Alert,
+  StatusBar,
+} from 'react-native';
 
-export default OtpVerificationScreen = ({ navigation }) => {
-  const [otp, setOtp] = useState(['', '', '', '']);
+const OtpVerificationScreen = ({navigation}) => {
+  const [otp, setOtp] = useState(['', '', '', '']); // Array to hold each digit
 
-  const handleChange = (index, value) => {
+  // Handler for input change
+  const handleChange = (value, index) => {
     let newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+
+    // Handle deletion
+    if (value === '' && index > 0) {
+      newOtp[index] = ''; // Clear current input
+      setOtp(newOtp);
+      refs[index - 1].focus(); // Move to previous input field
+    } else {
+      newOtp[index] = value; // Set the current value
+      setOtp(newOtp);
+
+      // Move to the next input field
+      if (value && index < 3) {
+        refs[index + 1].focus();
+      }
+    }
   };
 
-  const handleVerify = () => {
-    //alert(`OTP entered: ${otp.join('')}`);
-    navigation.navigate('CreateNewPassword');
+  const verifyOtp = () => {
+    const otpCode = otp.join(''); // Join the digits to form the OTP code
+    if (otpCode.length === 4) {
+      // Example verification logic
+      Alert.alert('OTP Verified', 'Your OTP code is ${otpCode}');
+      navigation.navigate('CreateNewPassword'); // Navigate to another screen
+    } else {
+      Alert.alert('Invalid OTP', 'Please enter the 4-digit OTP');
+    }
   };
+
+  // Array to hold references to the input fields
+  const refs = [];
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="white"
+        fontWeight="bold"
+      />
       <View style={styles.topView}>
-        <Image source={require('../assets/EnterOTP.png')} style={{ alignSelf: 'center' }} />
+        <Image
+          source={require('../assets/EnterOTP.png')}
+          style={{
+            alignSelf: 'center',
+            height: '100%',
+            width: '59%',
+            marginTop: 13,
+          }}
+        />
       </View>
-      <View style={styles.bottomView}><Text style={{ color: 'white', textAlign: 'center', fontSize: 30, paddingBottom: 20 }}>OTP Verification</Text>
-        <Text style={{ color: 'white', textAlign: 'center', fontSize: 15, paddingBottom: 20 }}>A 4 Digit Code has been sent to your registered Mobile No or E-Mail</Text>
+      <View style={styles.bottomView}>
+        <Text style={styles.titleText}>OTP Verification</Text>
+        <Text style={styles.instructionText}>
+          A 4 Digit Code has been Set to register Mobile No or E-Mail
+        </Text>
         <View style={styles.otpContainer}>
-          {otp.map((value, index) => (
+          {otp.map((digit, index) => (
             <TextInput
               key={index}
+              ref={input => (refs[index] = input)}
               style={styles.otpInput}
-              value={value}
-              onChangeText={(text) => handleChange(index, text)}
               keyboardType="numeric"
               maxLength={1}
+              onChangeText={value => handleChange(value, index)}
+              value={digit}
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
+        <TouchableOpacity style={styles.verifyButton} onPress={verifyOtp}>
           <Text style={styles.verifyButtonText}>Verify</Text>
         </TouchableOpacity>
-        <Text style={{ color: 'white', alignSelf: 'center', paddingTop: 40, fontSize: 15 }}>Don't Get a Code? <Text style={{ color: 'black' }}>Resend</Text></Text></View>
-    </View >
-
-
+        <Text style={styles.resendText}>
+          Don't get a code? <Text style={styles.resendLink}>Resend</Text>
+        </Text>
+      </View>
+    </View>
   );
 };
 
@@ -54,51 +103,78 @@ const styles = StyleSheet.create({
   topView: {
     backgroundColor: 'white',
     height: '30%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 45,
   },
   bottomView: {
     backgroundColor: '#20D4D4',
     height: '70%',
     paddingHorizontal: 20,
-    borderTopStartRadius: 20,
-    borderTopEndRadius: 20,
-    paddingTop: 60,
+    borderTopStartRadius: 40,
+    borderTopEndRadius: 40,
+    paddingTop: 55,
+    alignItems: 'center',
   },
-  text: {
+  titleText: {
     color: 'white',
+    textAlign: 'center',
+    fontSize: 30,
+    paddingBottom: 10,
+    paddingTop: -10,
+  },
+  instructionText: {
+    color: 'white',
+    textAlign: 'center',
+    padding: 10,
+    fontSize: 17.5,
+    fontWeight: '500',
+    paddingBottom: 35,
   },
   otpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '80%',
-    marginBottom: 20,
+    width: '100%',
+    marginBottom: 15,
   },
   otpInput: {
-    width: 50,
-    height: 50,
-    borderWidth: 1,
-    borderRadius: 10,
+    width: 68,
+    height: 75,
+    borderWidth: 2,
+    borderRadius: 8,
     borderColor: 'white',
     textAlign: 'center',
     color: 'white',
+    marginBottom: 15,
     fontSize: 18,
     backgroundColor: '#20D4D4',
-    marginHorizontal: 5
+    marginHorizontal: 12,
   },
   verifyButton: {
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    width: '95%',
+    marginTop: 25,
+    padding: 13,
     backgroundColor: 'white', // Button color
     borderRadius: 20,
   },
   verifyButtonText: {
     color: 'black',
     fontSize: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  resendText: {
+    color: 'white',
+    alignSelf: 'center',
+    paddingTop: 40,
+    fontSize: 17,
   },
   resendLink: {
-    color: '#00796b',
+    color: 'black',
     fontWeight: 'bold',
+    fontSize: 18.5,
   },
 });
+
+export default OtpVerificationScreen;
