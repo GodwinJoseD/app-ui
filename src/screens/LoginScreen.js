@@ -5,6 +5,7 @@ export default LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleGoogleLogoClick = () => {
         Alert.alert("Google Logo Got Clicked", "You clicked on the Google logo!");
@@ -16,6 +17,32 @@ export default LoginScreen = ({ navigation }) => {
 
     const handletweetLogoClick = () => {
         Alert.alert("Twitter Logo Got Clicked", "You clicked on the Twitter logo!");
+    };
+
+    const handleLogin = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: email, password })
+            });
+            console.log('Login request sent:', response);
+            console.log(JSON.stringify({ name: email, password }));
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login failed');
+            }
+
+            const data = await response.json();
+            console.log('Login successful:', data);
+            // Handle successful login (e.g., save token, redirect, etc.)
+            navigation.navigate('CreateNewPassword');
+        } catch (error) {
+            console.error('Error:', error);
+            setErrorMessage(error.message);
+        }
     };
 
     return (
@@ -59,9 +86,13 @@ export default LoginScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
+                {errorMessage ? (
+                    <Text style={styles.errorText}>{errorMessage}</Text>
+                ) : null}
+
                 <Text style={styles.text} onPress={() => navigation.navigate('ForgotPassword')}>Forgot password?</Text>
 
-                <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('ProfilePage')}>
+                <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                     <Text style={styles.loginText}>Login</Text>
                 </TouchableOpacity>
 
@@ -161,6 +192,11 @@ const styles = StyleSheet.create({
         color: 'black',
         fontSize: 20,
         textAlign: 'center',
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 10,
     },
     socialIconsContainer: {
         flexDirection: 'row',

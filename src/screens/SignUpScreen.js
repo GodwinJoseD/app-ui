@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { Text, View, Image, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { CheckBox } from '@react-native-community/checkbox';
+import { Text, View, Image, TouchableOpacity, StyleSheet, Alert, TextInput } from 'react-native';
 import InputField from "../components/InputField";
+import CountryPicker from 'react-native-country-picker-modal';
 
 const SignUpScreen = ({ navigation }) => {
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [isSelected, setSelection] = useState(false);
+    const [password, setPassword] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [countryCode, setCountryCode] = useState('US');
+    const [callingCode, setCallingCode] = useState('+1');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleGoogleLogoClick = () => {
         Alert.alert("Google Logo Got Clicked", "You clicked on the Google logo!");
@@ -20,6 +23,51 @@ const SignUpScreen = ({ navigation }) => {
         Alert.alert("Twitter Logo Got Clicked", "You clicked on the Twitter logo!");
     };
 
+    const handleSignUp = async () => {
+        const fullPhoneNumber = `${callingCode}${phoneNumber}`;
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, password, phoneNumber: fullPhoneNumber })
+            });
+            console.log('Sign-up request sent:', response);
+            console.log(JSON.stringify({ name, password, phoneNumber: fullPhoneNumber }));
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Sign-up failed');
+            }
+
+            const data = await response.json();
+            console.log('Sign-up successful:', data);
+
+            // Call the OTP API
+            const otpResponse = await fetch('http://localhost:5000/api/otp/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ phoneNumber: fullPhoneNumber })
+            });
+            console.log(JSON.stringify({ phoneNumber: fullPhoneNumber }))
+
+            if (!otpResponse.ok) {
+                throw new Error('Failed to send OTP');
+            }
+
+            const otpData = await otpResponse.json();
+            console.log('OTP sent successfully:', otpData);
+
+            // Navigate to OTP verification page
+            navigation.navigate('VerifyOtp', { phoneNumber: fullPhoneNumber });
+        } catch (error) {
+            console.error('Error:', error);
+            setErrorMessage(error.message);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.topView}>
@@ -30,11 +78,33 @@ const SignUpScreen = ({ navigation }) => {
                     value={name}
                     onChangeText={setName}
                     placeholder="Name" />
+                <CountryPicker
+                    countryCode={countryCode}
+                    withCallingCode
+                    withFilter
+                    withFlag
+                    withCountryNameButton
+                    onSelect={(country) => {
+                        setCountryCode(country.cca2);
+                        setCallingCode(`+${country.callingCode[0]}`);
+                    }}
+                />
                 <InputField
-                    value={email}
-                    onChangeText={setEmail}
-                    placeholder="Mobile Number or E-mail" />
-                <TouchableOpacity style={styles.loginbutton} onPress={() => navigation.navigate('VerifyOtp')}>
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    placeholder="Phone Number" />
+                <TextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Password"
+                    placeholderTextColor="white"
+                    secureTextEntry={true}
+                    style={styles.input}
+                />
+                {errorMessage ? (
+                    <Text style={styles.errorText}>{errorMessage}</Text>
+                ) : null}
+                <TouchableOpacity style={styles.loginbutton} onPress={handleSignUp}>
                     <Text style={styles.logintext}>Sign Up</Text>
                 </TouchableOpacity>
                   
@@ -112,6 +182,18 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center'
     },
+    input: {
+        backgroundColor: 'transparent',
+        borderRadius: 30,
+        marginTop: 15,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderWidth: 2, // Increased border width
+        borderColor: '#FFFFFF', // Brighter white color
+        color: 'white',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
     checkbox: {
         alignSelf: 'center',
     },
@@ -134,6 +216,11 @@ const styles = StyleSheet.create({
     socialIcon: {
         width: 25,
         height: 25,
+    },
+    errorText: {
+        color: 'red',
+        textAlign: 'center',
+        marginTop: 10,
     },
 });
 

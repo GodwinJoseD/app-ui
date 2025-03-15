@@ -63,7 +63,7 @@ export default Navigation = () => {
           }}
         />
         <Stack.Screen
-          name="Login"
+          name="ProfileScreen"
           component={ProfileScreen}
           options={{
             headerTitle: ' Fill Your Profile',

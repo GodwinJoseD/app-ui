@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,12 @@ import {
   StatusBar,
 } from 'react-native';
 
-const OtpVerificationScreen = ({navigation}) => {
+const OtpVerificationScreen = ({ route, navigation }) => {
+  const { phoneNumber } = route.params;
   const [otp, setOtp] = useState(['', '', '', '']); // Array to hold each digit
+  const [errorMessage, setErrorMessage] = useState('');
+  const [timer, setTimer] = useState(30);
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
 
   // Handler for input change
   const handleChange = (value, index) => {
@@ -33,16 +37,78 @@ const OtpVerificationScreen = ({navigation}) => {
     }
   };
 
-  const verifyOtp = () => {
+  const verifyOtp = async () => {
     const otpCode = otp.join(''); // Join the digits to form the OTP code
     if (otpCode.length === 4) {
-      // Example verification logic
-      Alert.alert('OTP Verified', 'Your OTP code is ${otpCode}');
-      navigation.navigate('CreateNewPassword'); // Navigate to another screen
+      try {
+        const response = await fetch('http://localhost:5000/api/otp/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ phoneNumber, otp: otpCode }),
+        });
+        console.log('OTP verification request sent:', response);
+        console.log(JSON.stringify({ phoneNumber, otp: otpCode }));
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'OTP verification failed');
+        }
+
+        const data = await response.json();
+        console.log('OTP verification successful:', data);
+        // Handle successful OTP verification (e.g., save token, redirect, etc.)
+        navigation.navigate('LoginScreen');
+      } catch (error) {
+        console.error('Error:', error);
+        setErrorMessage(error.message);
+      }
     } else {
       Alert.alert('Invalid OTP', 'Please enter the 4-digit OTP');
     }
   };
+
+  const resendOtp = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/otp/resend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+      console.log('OTP resend request sent:', response);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to resend OTP');
+      }
+
+      const data = await response.json();
+      console.log('OTP resent successfully:', data);
+      setIsResendDisabled(true);
+      setTimer(30);
+    } catch (error) {
+      console.error('Error:', error);
+      setErrorMessage(error.message);
+    }
+  };
+
+  useEffect(() => {
+    let interval;
+    if (isResendDisabled) {
+      interval = setInterval(() => {
+        setTimer(prevTimer => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+            setIsResendDisabled(false);
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isResendDisabled]);
 
   // Array to hold references to the input fields
   const refs = [];
@@ -83,11 +149,22 @@ const OtpVerificationScreen = ({navigation}) => {
             />
           ))}
         </View>
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
         <TouchableOpacity style={styles.verifyButton} onPress={verifyOtp}>
           <Text style={styles.verifyButtonText}>Verify</Text>
         </TouchableOpacity>
         <Text style={styles.resendText}>
-          Don't get a code? <Text style={styles.resendLink}>Resend</Text>
+          Don't get a code?{' '}
+          <TouchableOpacity
+            onPress={resendOtp}
+            disabled={isResendDisabled}
+          >
+            <Text style={styles.resendLink}>
+              Resend {isResendDisabled ? `(${timer}s)` : ''}
+            </Text>
+          </TouchableOpacity>
         </Text>
       </View>
     </View>
@@ -174,6 +251,11 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     fontSize: 18.5,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
 
